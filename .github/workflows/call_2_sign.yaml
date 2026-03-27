@@ -1,0 +1,24 @@
+name: Build, Sign and Push to Harbor
+
+# Определяем триггеры: запуск при пуше в main или вручную
+on:
+  workflow_dispatch:
+
+jobs:
+  # Вызов переиспользуемого workflow из центрального репозитория
+  publish-image:
+    # ПУТЬ К WORKFLOW: заментте 'your-org/central-repo' на путь к вашему репозиторию с экшном
+    uses: myTestOrg0/cosign_workflow/.github/workflows/upload.yaml@main
+    
+    # Передача входных параметров (inputs)
+    with:
+      image_name: "k8s-hello-secops-test"            # Имя вашего образа
+      harbor_registry: "harbor.dev.k8s-dev.org" # Адрес вашего Harbor
+      team: "team-secops"             # Команда, которую нужно выполнить перед сборкой
+      environment_name: "production"       # Имя окружения, где лежит COSIGN_KEY
+      tag: "1.0.4"
+      
+    # Передача секретов
+    secrets:
+      # Секрет HARBOR_KEY должен быть создан в настройках ЭТОГО репозитория
+      HARBOR_KEY: ${{ secrets.MY_HARBOR_TOKEN }}
