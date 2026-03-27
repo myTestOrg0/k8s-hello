@@ -1,0 +1,3 @@
+# HELP k8s_hello_up 1 if app is healthy
+# TYPE k8s_hello_up gauge
+k8s_hello_up 1

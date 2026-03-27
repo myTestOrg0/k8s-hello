@@ -1,0 +1,10 @@
+assembly-versioning-scheme: MajorMinorPatch
+mode: Mainline
+major-version-bump-message: '^(breaking|BREAKING)( CHANGE| change)?: |^(major|MAJOR): '
+minor-version-bump-message: '(feat|feature): '
+patch-version-bump-message: 'fix: '
+no-bump-message: 'skip: '
+branches: { }
+ignore:
+  sha: [ ]
+merge-message-formats: { }
