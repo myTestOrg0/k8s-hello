@@ -5,7 +5,7 @@ on:
 
 jobs:
   sign-and-release:
-    uses: org-name/signer-repository/.github/workflows/sign-and-release.yml@main
+    uses: myTestOrg0/cosign_workflow/.github/workflows/upload.yml@main
     with:
       image_name: harbor.example.com/project/repo1
       image_tag: 1.0.5
