@@ -125,7 +125,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: harbor.dev.k8s-dev.org
-          username: robot$team-secops+test
+          username: 'robot$team-secops+test'
           password: ${{ secrets.HARBOR_PASSWORD }}
 
       - name: Push image
