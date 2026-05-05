@@ -1,0 +1,135 @@
+name: Build and push Docker image to Harbor
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to build"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+ 
+
+  # Пример: harbor.example.com
+  HARBOR_REGISTRY: harbor.dev.k8s-dev.org
+
+  # Пример: my-project/my-service
+  HARBOR_IMAGE: team-secops/k8s-hello-secops-test
+
+
+jobs:
+  checkout-source:
+    name: Checkout source
+    runs-on: ubuntu-latest
+
+    # В GitHub Environment настрой Deployment branches: selected branch = main
+    # Это ограничит запуск job только из main.
+    environment: harbor-publish
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+
+    steps:
+      - name: Checkout requested branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Prepare image tag
+        id: meta
+        shell: bash
+        run: |
+          SAFE_BRANCH="$(echo "${{ inputs.branch }}" | tr '/[:upper:]' '-[:lower:]' | tr -cd 'a-z0-9_.-')"
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          echo "image_tag=${SAFE_BRANCH}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Pack source code
+        run: |
+          tar \
+            --exclude='.git' \
+            -czf "${{ runner.temp }}/source.tar.gz" \
+            .
+
+      - name: Upload source artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-code
+          path: ${{ runner.temp }}/source.tar.gz
+          retention-days: 1
+
+  build-image:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    needs: checkout-source
+    environment: harbor-publish
+
+    env:
+      IMAGE_REF: ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_IMAGE }}:${{ needs.checkout-source.outputs.image_tag }}
+
+    steps:
+      - name: Download source artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: source-code
+          path: ${{ runner.temp }}
+
+      - name: Unpack source code
+        run: |
+          mkdir source
+          tar -xzf "${{ runner.temp }}/source.tar.gz" -C source
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build image and export as tar
+        uses: docker/build-push-action@v7
+        with:
+          context: ./source
+          file: ./source/Dockerfile
+          tags: ${{ env.IMAGE_REF }}
+          outputs: type=docker,dest=${{ runner.temp }}/image.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: ${{ runner.temp }}/image.tar
+          retention-days: 1
+
+  push-image:
+    name: Push Docker image to Harbor
+    runs-on: ubuntu-latest
+    needs:
+      - checkout-source
+      - build-image
+    environment: harbor-publish
+
+    env:
+      IMAGE_REF: ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_IMAGE }}:${{ needs.checkout-source.outputs.image_tag }}
+
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: ${{ runner.temp }}
+
+      - name: Load Docker image
+        run: |
+          docker load --input "${{ runner.temp }}/image.tar"
+          docker image ls "${{ env.IMAGE_REF }}"
+
+      - name: Login to Harbor
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.HARBOR_REGISTRY }}
+          username: robot$team-secops+test
+          password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Push image
+        run: |
+          docker push "${{ env.IMAGE_REF }}"
