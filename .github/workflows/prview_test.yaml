@@ -11,20 +11,16 @@ on:
 permissions:
   contents: read
 
-env:
- 
 
-  # Пример: harbor.example.com
-  HARBOR_REGISTRY: harbor.dev.k8s-dev.org
-
-  # Пример: my-project/my-service
-  HARBOR_IMAGE: team-secops/k8s-hello-secops-test
 
 
 jobs:
   checkout-source:
     name: Checkout source
     runs-on: ubuntu-latest
+    env:
+      HARBOR_REGISTRY: harbor.dev.k8s-dev.org
+      HARBOR_IMAGE: team-secops/k8s-hello-secops-test
 
     # В GitHub Environment настрой Deployment branches: selected branch = main
     # Это ограничит запуск job только из main.
@@ -68,7 +64,9 @@ jobs:
     environment: harbor-publish
 
     env:
-      IMAGE_REF: ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_IMAGE }}:${{ needs.checkout-source.outputs.image_tag }}
+      HARBOR_REGISTRY: harbor.dev.k8s-dev.org
+      HARBOR_IMAGE: team-secops/k8s-hello-secops-test
+      IMAGE_REF: harbor.dev.k8s-dev.org/team-secops/k8s-hello-secops-test:${{ needs.checkout-source.outputs.image_tag }}
 
     steps:
       - name: Download source artifact
@@ -109,7 +107,7 @@ jobs:
     environment: harbor-publish
 
     env:
-      IMAGE_REF: ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_IMAGE }}:${{ needs.checkout-source.outputs.image_tag }}
+      IMAGE_REF: harbor.dev.k8s-dev.org/team-secops/k8s-hello-secops-test:${{ needs.checkout-source.outputs.image_tag }}
 
     steps:
       - name: Download image artifact
