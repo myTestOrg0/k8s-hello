@@ -1,0 +1,21 @@
+name: Print Hello
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  print-hello:
+    name: Print Hello
+    runs-on: ubuntu-latest
+    # В GitHub Environment настрой Deployment branches: selected branch = main
+    # Это ограничит запуск job только из main.
+    environment: harbor-publish
+
+    steps:
+      - name: Print
+        id: meta
+        shell: bash
+        run: |
+          echo "HELLO"
+
+     
