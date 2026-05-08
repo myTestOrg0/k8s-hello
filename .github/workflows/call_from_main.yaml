@@ -17,4 +17,4 @@ jobs:
         run: |
           gh workflow run hello_workflow.yaml \
             --repo "${{ github.repository }}" \
-            --ref main"
+            --ref main
