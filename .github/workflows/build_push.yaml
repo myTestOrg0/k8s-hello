@@ -13,7 +13,7 @@ jobs:
     environment: prod
 
     env:
-      REGISTRY: harbor.prod.k8s-prod.org/
+      REGISTRY: harbor.prod.k8s-prod.org
       REPOSITORY: team-secops/k8s-hello-secops-test
       TAG: v1.0.0
 
