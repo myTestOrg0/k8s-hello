@@ -15,10 +15,10 @@ jobs:
     env:
       REGISTRY: harbor.critical.k8s-prod.org
       REPOSITORY: team-secops/k8s-hello-secops-test
-      TAG: 1.0.0
+      TAG: v1.0.0
 
     steps:
-      - name: Checkout
+      - name: Checkut
         uses: actions/checkout@v4
 
       - name: Setup buildx
