@@ -19,7 +19,7 @@ jobs:
     environment: prod
 
     env:
-      REGISTRY: harbor.critical.k8s-prod.org
+      REGISTRY: registry.critical.k8s-prod.org
       REPOSITORY: team-secops/k8s-hello-secops-test
       TAG: ${{inputs.tag_name}}
 
