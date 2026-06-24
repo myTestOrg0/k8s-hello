@@ -16,7 +16,7 @@ permissions:
 jobs:
   build-sign-push:
     runs-on: ubuntu-22.04
-    environment: prod
+    environment: harbor_crit_release
 
     env:
       REGISTRY: registry.critical.k8s-prod.org
