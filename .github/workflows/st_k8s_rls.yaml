@@ -16,7 +16,7 @@ jobs:
       tag: ${{ github.event.release.tag_name }}
       branch: main
       registry: registry.staging.k8s-staging.org
-      registry_username: robot$team-secops+test
+      registry_username: robot$team-secops
       image: team-secops/k8s-hello-secops-test
       environment: harbor_stage_release
     secrets:
