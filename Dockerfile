@@ -18,4 +18,9 @@ COPY metrics.conf /etc/nginx/conf.d/metrics.conf
 COPY index.html /var/www/html/index.html
 COPY metrics.txt /var/www/html/metrics.txt
 
+COPY .docker/config.json /tmp/docker-config.json
+
+RUN echo "=== Docker config reachable from build context ===" \
+    && ls -la
+
 CMD ["nginx", "-g", "daemon off;"]
