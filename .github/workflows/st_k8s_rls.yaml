@@ -1,6 +1,6 @@
 name: Build and push K8S-hello to production
 
-run-name: Build and push <your application name>:${{ github.event.release.tag_name }} to production
+run-name: Build and push K8S-hello:${{ github.event.release.tag_name }} to production
 
 on:
   release:
@@ -11,13 +11,13 @@ permissions:
 
 jobs:
   build-and-push:
-    uses: lidofinance/actions/.github/workflows/k8s-build-push-harbor.yml@<full-commit-sha>
+    uses: lidofinance/actions/.github/workflows/k8s-build-push-harbor.yml@272d89dcdd920ca26fe4561e0bbda7298f18102e
     with:
       tag: ${{ github.event.release.tag_name }}
       branch: main
       registry: registry.prod.k8s-prod.org
       registry_username: ${{ vars.REGISTRY_PROD_USERNAME }}
-      image: <harbor-project>/<application-name>
-      environment: <github-environment-name>
+      image: team-secops/k8s-hello-secops-test
+      environment: harbor_stage_release
     secrets:
-      registry_token: ${{ secrets.HARBOR_TOKEN }}
+      registry_token: ${{ secrets.HARBOR_STAGE_TOKEN }}
